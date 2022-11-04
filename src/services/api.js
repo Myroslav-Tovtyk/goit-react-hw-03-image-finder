@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'https://pixabay.com/api';
-const KEY = '16763452-f17d9c1e6c077c804b5291364';
+axios.defaults.baseURL = 'https://pixabay.com/api/';
+const KEY = '29598631-67f61c45caf91015f5fc88c1e';
 
 export const PixabayPictures = async (q, page) => {
   const params = {
