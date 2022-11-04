@@ -14,6 +14,5 @@ export const PixabayPictures = async (q, page) => {
     page,
   };
   const response = await axios.get(axios.defaults.baseURL, { params });
-  // console.log('response.data : ', response.data);
   return response.data;
 };

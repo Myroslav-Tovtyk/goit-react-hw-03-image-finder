@@ -1,12 +1,13 @@
+import { Container } from './Container/Container.styled';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Component } from 'react';
 import { PixabaySearch } from './PixabaySearch/PixabaySearch';
 import { PixabayPictures } from 'services/api';
 import { Pictures } from './Pictures/Pictures';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Container } from './Container/Container.styled';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
+import { BtnLoadMore } from './BtnLoadMore/BtnLoadMore';
 
 export class App extends Component {
   state = {
@@ -15,7 +16,8 @@ export class App extends Component {
     isLoading: false,
     page: 1,
     largeImage: '',
-    modalShow: false,
+    modalActive: false,
+    totalHits: 0,
   };
 
   getPics = async values => {
@@ -23,9 +25,12 @@ export class App extends Component {
       return toast.warning('Please, enter Your search query');
     }
     try {
-      this.setState({ isLoading: true });
-      const pix = await PixabayPictures(values);
-      this.setState({ pictures: pix.hits, q: values.query });
+      this.setState({
+        q: values.query,
+        pictures: [],
+        isLoading: true,
+        page: 1,
+      });
     } catch (error) {
       console.log(error);
     } finally {
@@ -37,9 +42,12 @@ export class App extends Component {
     const { page, q } = this.state;
 
     if (prevState.page !== page || prevState.q !== q) {
-      this.setState({ isloading: true });
+      this.setState({ isLoading: true });
+
       try {
         const response = await PixabayPictures(q, page);
+        this.setState({ totalHits: response.totalHits });
+
         if (response.hits.length === 0) {
           return toast.error('No match. Type new query');
         }
@@ -50,7 +58,7 @@ export class App extends Component {
       } catch (error) {
         return toast.error('Something goes wrong...');
       } finally {
-        this.setState({ loading: false });
+        this.setState({ isLoading: false });
       }
     }
   }
@@ -61,19 +69,31 @@ export class App extends Component {
   };
 
   toggleModal = () => {
-    this.setState(({ modalShow }) => ({
-      modalShow: !modalShow,
+    this.setState(({ modalActive }) => ({
+      modalActive: !modalActive,
+    }));
+  };
+
+  loadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
     }));
   };
 
   render() {
-    const { pictures, isLoading, modalShow, largeImage } = this.state;
+    const { pictures, isLoading, modalActive, largeImage, totalHits } =
+      this.state;
     return (
       <Container>
-        <PixabaySearch onSubmit={this.getPics} onClick={this.showModal} />
-        <Pictures items={pictures} />
+        <PixabaySearch onSubmit={this.getPics} />
+        <Pictures items={pictures} onClick={this.showModal} />
         {isLoading && <Loader dots={true} />}
-        {modalShow && <Modal image={largeImage} onClose={this.toggleModal} />}
+        {modalActive && (
+          <Modal bigImage={largeImage} onClose={this.toggleModal} />
+        )}
+        {pictures.length !== 0 && pictures.length < totalHits && (
+          <BtnLoadMore onClick={this.loadMore} />
+        )}
         <ToastContainer />
       </Container>
     );

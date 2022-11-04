@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import { SearchHeader, Forma, Button, Input } from './PixabaySearch.styled';
 
@@ -22,3 +23,5 @@ export const PixabaySearch = ({ onSubmit }) => {
     </Formik>
   );
 };
+
+PixabaySearch.propTypes = { onSubmit: PropTypes.func.isRequired };

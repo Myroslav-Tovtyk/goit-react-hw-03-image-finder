@@ -28,7 +28,7 @@ export class Modal extends Component {
     return createPortal(
       <Overlay onClick={this.handleOverlayClick}>
         <ModalField>
-          <img src={this.props.image} alt="big" />
+          <img src={this.props.bigImage} alt="largeImage" />
         </ModalField>
       </Overlay>,
       modalRoot
